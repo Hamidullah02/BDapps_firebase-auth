@@ -15,16 +15,22 @@ class registerScreen extends StatefulWidget {
 class _registerScreenState extends State<registerScreen> {
   final _emailContrlr = TextEditingController();
   final _passContrlr = TextEditingController();
+  bool _isLoading = false;
 
-  Future<void> login() async {
+  Future<void> register() async {
+    setState(() => _isLoading = true);
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailContrlr.text.trim(),
         password: _passContrlr.text.trim(),
       );
-      Get.toNamed(Approutes.QUIZSCREEN);
+      Get.offAllNamed(Approutes.QUIZSCREEN);
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.message ?? "Authentication failed");
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -53,7 +59,10 @@ class _registerScreenState extends State<registerScreen> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: login, child: const Text("Register")),
+            ElevatedButton(
+              onPressed: _isLoading ? null : register,
+              child: const Text("Register"),
+            ),
             TextButton(
               onPressed: () => Get.toNamed(Approutes.LOGINSCREEN),
               child: const Text("already have an account? login here"),

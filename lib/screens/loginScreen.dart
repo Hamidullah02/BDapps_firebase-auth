@@ -15,6 +15,8 @@ class loginScreen extends StatefulWidget {
 class _loginScreenState extends State<loginScreen> {
   final _emailContrlr = TextEditingController();
   final _passContrlr = TextEditingController();
+  bool _isLoading = false;
+
 
   Future<void> login() async {
     try {
@@ -25,6 +27,11 @@ class _loginScreenState extends State<loginScreen> {
       Get.offAllNamed(Approutes.QUIZSCREEN);
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.message ?? "Authentication failed");
+    }
+    finally{
+      if(mounted){
+        setState(() => _isLoading = false);
+      }
     }
   }
   @override
@@ -52,7 +59,7 @@ class _loginScreenState extends State<loginScreen> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: login, child: const Text("Login")),
+            ElevatedButton(onPressed: _isLoading ? null : login, child: const Text("Login")),
             TextButton(
               onPressed: () => Get.toNamed(Approutes.REGISTERSCREEN),
               child: const Text("Don't have an account? Register here"),
